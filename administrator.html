@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arwa Kitchen Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+ --purple-ink:#150a29;--purple-deep:#2b0f5c;--purple:#5b21b6;--purple-light:#9d6dff;
+ --gold-deep:#a9790b;--gold:#d6a337;--gold-light:#f2c863;
+ --white:#ffffff;--paper:#faf7ff;--ink:#160c28;--red:#e0554a;
+ --green:var(--purple-deep);--green-mid:var(--purple);--green-light:var(--purple-light);
+ --cream:var(--paper);--dark:var(--ink);--muted:#7a6e91;--border:#ece4fb
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',sans-serif;background:var(--cream);color:var(--dark)}
+h1,h2,.brand,.stat-num,.login-logo{font-family:'Fraunces',serif;}
+button,input{font:inherit}
+.ic{display:inline-block;vertical-align:-3px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--purple-ink),var(--purple));color:white;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 8px 25px rgba(0,0,0,.24)}
+
+.brand{font-family:'Fraunces',serif;font-size:1.45rem;font-weight:900}
+.brand span{color:var(--gold)}
+.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.status{display:flex;align-items:center;gap:7px;font-size:.8rem;color:rgba(255,255,255,.85)}
+.dot{width:9px;height:9px;border-radius:50%;background:#aaa}.dot.on{background:#4caf62}.dot.off{background:#f05d4f}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--dark)}
+.btn-light{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.btn-red{background:#fde9e7;color:var(--red)}
+.btn-green{background:var(--green);color:#fff}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.page{max-width:1250px;margin:0 auto;padding:28px 20px 50px}
+.welcome{margin-bottom:24px}.welcome h1{font-family:'Fraunces',serif;font-size:2rem;margin-bottom:4px}.welcome p{color:var(--muted);font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:24px}
+.stat{background:white;border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 4px 18px rgba(0,0,0,.05)}
+.stat-label{font-size:.78rem;color:var(--muted);font-weight:700}.stat-num{font-family:'Fraunces',serif;font-size:2rem;color:var(--green);margin-top:5px}
+.panel{background:white;border:1px solid var(--border);border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.05);overflow:hidden}
+.panel-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.panel-head h2{font-family:'Fraunces',serif;font-size:1.25rem}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filter-btn{padding:8px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:800;font-size:.78rem;color:#566}
+.filter-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.orders{padding:18px;display:flex;flex-direction:column;gap:14px}
+.order-card{border:1px solid var(--border);border-left:5px solid var(--green-light);border-radius:16px;padding:18px;background:#fff}
+.order-card.new{border-left-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.08)}
+.order-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.order-id{font-weight:900;color:var(--green)}.badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.badge{padding:4px 9px;border-radius:15px;font-size:.72rem;font-weight:900}
+.badge-new{background:#fff4cf;color:#7a5c00}.badge-done{background:#dff4e4;color:#155724}.badge-cart{background:#efe3fb;color:var(--green)}.badge-monthly{background:#fff3cd;color:#856404}.badge-event{background:#f8d7da;color:#721c24}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.info{background:#f7f2fc;border-radius:12px;padding:11px 13px}.info strong{display:block;font-size:.72rem;color:var(--muted);margin-bottom:3px}.info div{font-size:.88rem;word-break:break-word}
+.items{margin-top:10px;background:#f7f2fc;border-radius:12px;padding:12px 14px;white-space:pre-wrap;font-size:.84rem;line-height:1.65}
+.total{font-weight:900;color:var(--green);font-size:1rem;margin-top:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.small{font-size:.78rem;color:var(--muted)}
+.empty{padding:55px 20px;text-align:center;color:#999}.empty .emoji{margin-bottom:10px;display:flex;justify-content:center;color:var(--purple-light)}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#0d0420,#2b0f5c,#1c0a3d);position:relative;overflow:hidden}
+.login-wrap::before{content:'';position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1600628421066-f6bda6a7b976?q=80&w=1400&auto=format&fit=crop');background-size:cover;background-position:center;opacity:.22;animation:kenburns 26s ease-in-out infinite alternate;}
+.login-card{position:relative;z-index:1}
+@keyframes kenburns{0%{transform:scale(1.06)}100%{transform:scale(1.18) translate(-1%,-1%)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+.login-card{width:100%;max-width:410px;background:#fff;border-radius:24px;padding:30px;box-shadow:0 25px 80px rgba(0,0,0,.3)}
+.login-logo{text-align:center;font-family:'Fraunces',serif;font-size:2rem;color:var(--green);margin-bottom:4px}.login-logo span{color:var(--gold)}
+.login-sub{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:24px}.field{margin-bottom:14px}.field label{display:block;font-size:.8rem;font-weight:800;color:#444;margin-bottom:6px}
+.field input{width:100%;padding:12px 14px;border:2px solid #e7ece8;border-radius:12px;outline:none}.field input:focus{border-color:var(--green-light)}
+.login-btn{width:100%;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;font-weight:900;cursor:pointer}
+.msg{min-height:20px;color:var(--red);font-size:.8rem;font-weight:800;margin:10px 0}
+.note{margin-top:14px;background:#f6faf7;border-radius:12px;padding:11px 12px;font-size:.75rem;color:#617066;line-height:1.55}
+.toast{position:fixed;right:20px;top:20px;z-index:100;background:var(--green);color:#fff;padding:12px 16px;border-radius:12px;font-weight:800;transform:translateX(140%);transition:.3s;box-shadow:0 8px 30px rgba(0,0,0,.2)}.toast.show{transform:translateX(0)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.topbar{padding:14px 15px}.page{padding:20px 13px 35px}.stats{grid-template-columns:1fr 1fr;gap:10px}.grid{grid-template-columns:1fr}.top-actions{width:100%}.status{margin-right:auto}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<section id="loginScreen" class="login-wrap">
+ <div class="login-card">
+ <div class="login-logo">Arwa<span>Kitchen</span></div>
+ <div class="login-sub">Secure Admin Dashboard</div>
+ <div class="field"><label>Admin Email</label><input id="email" type="email" placeholder="admin@example.com" autocomplete="username"></div>
+ <div class="field"><label>Password</label><input id="password" type="password" placeholder="Enter admin password" autocomplete="current-password"></div>
+ <div class="msg" id="loginMsg"></div>
+ <button class="login-btn" id="loginBtn" onclick="loginAdmin()">Login to Dashboard →</button>
+ <div class="note">Only your dedicated admin account should be used on this page. Customer accounts are for the main website.</div>
+ </div>
+</section>
+
+<section id="dashboard" style="display:none">
+ <div class="topbar">
+ <div class="brand">Arwa<span>Kitchen</span> Admin</div>
+ <div class="top-actions">
+ <div class="status"><span class="dot" id="dot"></span><span id="statusText">Connecting…</span></div>
+ <button class="btn btn-light" onclick="requestNotification()"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" style="stroke:white;vertical-align:-2px;margin-right:4px;"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Notifications</button>
+ <button class="btn btn-gold" onclick="logoutAdmin()">Logout</button>
+ </div>
+ </div>
+ <main class="page">
+ <div class="welcome">
+ <h1>Order Dashboard</h1>
+ <p id="adminEmailLabel">Live orders from your Arwa Kitchen website.</p>
+ </div>
+ <div class="stats">
+ <div class="stat"><div class="stat-label">TOTAL ORDERS</div><div class="stat-num" id="statTotal">0</div></div>
+ <div class="stat"><div class="stat-label">NEW ORDERS</div><div class="stat-num" id="statNew">0</div></div>
+ <div class="stat"><div class="stat-label">REVENUE</div><div class="stat-num" id="statRevenue">Rs. 0</div></div>
+ <div class="stat"><div class="stat-label">MONTHLY PLANS</div><div class="stat-num" id="statMonthly">0</div></div>
+ </div>
+ <section class="panel">
+ <div class="panel-head">
+ <h2> Orders</h2>
+ <div class="filters">
+ <button class="filter-btn active" id="fAll" onclick="setFilter('all')">All</button>
+ <button class="filter-btn" id="fNew" onclick="setFilter('new')">New</button>
+ <button class="filter-btn" id="fDone" onclick="setFilter('done')">Completed</button>
+ <button class="filter-btn" id="fCart" onclick="setFilter('cart')">Cart</button>
+ <button class="filter-btn" id="fMonthly" onclick="setFilter('monthly')">Monthly</button>
+ </div>
+ </div>
+ <div class="orders" id="ordersList"></div>
+ </section>
+ </main>
+</section>
+
+<script>
+window.FIREBASE_CONFIG = {
+ apiKey: "AIzaSyDIOdMEyc1zc4CfNjix4zBZCvHiHjw2fsQ",
+ authDomain: "arwakitchen-9f5ae.firebaseapp.com",
+ projectId: "arwakitchen-9f5ae",
+ storageBucket: "arwakitchen-9f5ae.appspot.com",
+ messagingSenderId: "976622351045",
+ appId: "1:976622351045:web:48eabe76cca2032c77f6ac"
+};
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+ initializeAuth,
+ browserSessionPersistence,
+ signInWithEmailAndPassword,
+ onAuthStateChanged,
+ signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+
+const app = initializeApp(window.FIREBASE_CONFIG);
+const db = getFirestore(app);
+const auth = initializeAuth(app, {
+ persistence: browserSessionPersistence
+});
+const ordersCol = collection(db, "orders");
+const ADMIN_EMAIL = "maheenkashif05@gmail.com";
+
+let allOrders = [];
+let unsubscribe = null;
+let currentFilter = "all";
+let audioCtx = null;
+
+window.loginAdmin = async function(){
+ const email = document.getElementById("email").value.trim().toLowerCase();
+ const password = document.getElementById("password").value;
+ const msg = document.getElementById("loginMsg");
+ const btn = document.getElementById("loginBtn");
+ if(!email || !password){ msg.textContent="Enter admin email and password."; return; }
+ if(email !== ADMIN_EMAIL){ msg.textContent="This account is not authorized as admin."; document.getElementById("password").value=""; return; }
+ btn.disabled=true; btn.textContent="⏳ Signing in..."; msg.textContent="";
+ try{ await signInWithEmailAndPassword(auth,email,password); }
+ catch(err){ console.error(err); msg.textContent=err.message || "Login failed."; }
+ finally{ btn.disabled=false; btn.textContent="Login to Dashboard →"; }
+};
+
+window.logoutAdmin = async function(){
+ if(unsubscribe){unsubscribe();unsubscribe=null;}
+ await signOut(auth);
+};
+
+window.setFilter = function(filter){
+ currentFilter=filter;
+ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+ const ids={all:"fAll",new:"fNew",done:"fDone",cart:"fCart",monthly:"fMonthly"};
+ document.getElementById(ids[filter]).classList.add("active");
+ renderOrders();
+};
+
+function showToast(text){
+ const t=document.getElementById("toast");
+ t.textContent=text;t.classList.add("show");
+ clearTimeout(window.toastTimer);
+ window.toastTimer=setTimeout(()=>t.classList.remove("show"),3200);
+}
+function setStatus(on,text){
+ document.getElementById("dot").className="dot "+(on?"on":"off");
+ document.getElementById("statusText").textContent=text;
+}
+function playNewOrderSound(){
+ try{
+ audioCtx=audioCtx||(window.AudioContext||window.webkitAudioContext)&&new(window.AudioContext||window.webkitAudioContext)();
+ if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+ [660,880,1047].forEach((freq,i)=>{
+ const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),start=audioCtx.currentTime+i*.18;
+ osc.frequency.value=freq;osc.type="sine";osc.connect(gain);gain.connect(audioCtx.destination);
+ gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(.35,start+.04);gain.gain.linearRampToValueAtTime(0,start+.25);
+ osc.start(start);osc.stop(start+.28);
+ });
+ }catch(e){console.warn("Sound unavailable",e);}
+}
+window.requestNotification=async function(){
+ if(!("Notification" in window)){showToast("Browser notifications are not supported.");return;}
+ const p=await Notification.requestPermission();
+ showToast(p==="granted"?" Notifications enabled.":"Notifications not enabled.");
+};
+function notifyNewOrder(order){
+ playNewOrderSound();showToast("New order received!");
+ if(window.Notification&&Notification.permission==="granted"){
+ try{new Notification(" New Order Arwa Kitchen",{body:(order.name||"Customer")+"\n"+(order.phone||"")});}catch(e){}
+ }
+}
+window.markDone=async function(id){
+ try{await updateDoc(doc(db,"orders",id),{status:"done"});showToast(" Order marked completed.");}
+ catch(err){console.error(err);showToast("Could not update order: "+(err.code||"error"));}
+};
+window.deleteOrder=async function(id){
+ if(!confirm("Delete this order permanently?"))return;
+ try{await deleteDoc(doc(db,"orders",id));showToast(" Order deleted.");}
+ catch(err){console.error(err);showToast("Could not delete order: "+(err.code||"error"));}
+};
+function typeBadge(type){
+ if(type==="monthly") return [" Monthly Plan","badge-monthly"];
+ if(type==="event") return [" Event Request","badge-event"];
+ return [" Cart Order","badge-cart"];
+}
+function formatTime(v){
+ try{return v&&v.toDate?v.toDate().toLocaleString("en-PK"):"Pending time";}catch{return "Pending time";}
+}
+function esc(v){
+ return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+function visibleOrders(){
+ return allOrders.filter(o=>{
+ if(currentFilter==="new")return o.status==="new";
+ if(currentFilter==="done")return o.status==="done";
+ if(currentFilter==="cart")return o.type==="cart";
+ if(currentFilter==="monthly")return o.type==="monthly";
+ return true;
+ });
+}
+function renderStats(){
+ document.getElementById("statTotal").textContent=allOrders.length;
+ document.getElementById("statNew").textContent=allOrders.filter(o=>o.status==="new").length;
+ document.getElementById("statMonthly").textContent=allOrders.filter(o=>o.type==="monthly").length;
+ const rev=allOrders.filter(o=>o.type==="cart").reduce((s,o)=>{
+ const n=parseInt(String(o.total||"").replace(/[^0-9]/g,""),10);return s+(Number.isFinite(n)?n:0);
+ },0);
+ document.getElementById("statRevenue").textContent="Rs. "+rev.toLocaleString("en-PK");
+}
+function renderOrders(){
+ renderStats();
+ const list=document.getElementById("ordersList"),items=visibleOrders();
+ if(!items.length){list.innerHTML='<div class="empty"><div class="emoji"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><p>No orders found.</p></div>';return;}
+ list.innerHTML=items.map(o=>{
+ const [typeText,typeClass]=typeBadge(o.type);
+ const status=o.status==="done"?'<span class="badge badge-done"> Completed</span>':'<span class="badge badge-new">● New</span>';
+ return `
+ <article class="order-card ${o.status==="new"?"new":""}">
+ <div class="order-head">
+ <div><div class="order-id">#${esc((o.id||"").slice(0,8))}</div><div class="small">${esc(formatTime(o.createdAt))}</div></div>
+ <div class="badges"><span class="badge ${typeClass}">${typeText}</span>${status}</div>
+ </div>
+ <div class="grid">
+ <div class="info"><strong>CUSTOMER</strong><div> ${esc(o.name||"—")}</div></div>
+ <div class="info"><strong>PHONE</strong><div> ${esc(o.phone||"—")}</div></div>
+ <div class="info"><strong>EMAIL</strong><div> ${esc(o.email||"—")}</div></div>
+ <div class="info"><strong>ADDRESS</strong><div> ${esc(o.address||"—")}</div></div>
+ </div>
+ <div class="items"><strong>ORDER DETAILS</strong><br>${esc(o.items||"—")}</div>
+ ${o.note?`<div class="small" style="margin-top:9px"> ${esc(o.note)}</div>`:""}
+ <div class="total"> ${esc(o.total||"—")}</div>
+ <div class="actions">
+ <button class="btn btn-green" ${o.status==="done"?"disabled":""} onclick="markDone('${o.id}')">${o.status==="done"?" Completed":" Mark Done"}</button>
+ <button class="btn btn-red" onclick="deleteOrder('${o.id}')"> Delete</button>
+ </div>
+ </article>`;
+ }).join("");
+}
+function startOrders(){
+ if(unsubscribe)unsubscribe();
+ setStatus(false,"Connecting…");
+ let initial=true;
+ const q=query(ordersCol,orderBy("createdAt","desc"));
+ unsubscribe=onSnapshot(q,snapshot=>{
+ setStatus(true,"Live");
+ if(!initial)snapshot.docChanges().forEach(change=>{if(change.type==="added")notifyNewOrder(change.doc.data());});
+ allOrders=snapshot.docs.map(d=>({id:d.id,...d.data()}));
+ renderOrders();initial=false;
+ },err=>{
+ console.error(err);setStatus(false,"Firestore rules/config error");showToast(" Could not load orders. Check Firestore rules.");
+ });
+}
+onAuthStateChanged(auth,user=>{
+ if(!user){
+ document.getElementById("loginScreen").style.display="flex";
+ document.getElementById("dashboard").style.display="none";
+ return;
+ }
+ if((user.email||"").toLowerCase()!==ADMIN_EMAIL){
+ signOut(auth);
+ document.getElementById("loginMsg").textContent="This account is not authorized as admin.";
+ return;
+ }
+ document.getElementById("loginScreen").style.display="none";
+ document.getElementById("dashboard").style.display="block";
+ document.getElementById("adminEmailLabel").textContent="Logged in as "+user.email+" • Live orders from Arwa Kitchen.";
+ startOrders();
+});
+</script>
+</body>
+</html>
